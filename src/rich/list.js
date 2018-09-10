@@ -4,11 +4,14 @@ const { compile } = require('../state');
 const { settings } = require('../utils/constants');
 const { wrap, unwrap } = require('./wrapping');
 
-const rprevious = /(\n|^)(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
-const rnext = /^\n*(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*/;
+const oprevious = /(\n|^)(([ ]{0,3}(\d+[.])[ \t]+.*)(\n.+|\n{2,}(\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
+const uprevious = /(\n|^)(([ ]{0,3}([*+-])[ \t]+.*)(\n.+|\n{2,}([*+-].*)[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
+const onext = /^\n*(([ ]{0,3}(\d+[.])[ \t]+.*)(\n.+|\n{2,}(\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*/;
+const unext = /^\n*(([ ]{0,3}([*+-])[ \t]+.*)(\n.+|\n{2,}([*+-].*)[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*/;
 const rbullettype = /^\s*([*+-])/;
 const rskipper = /[^\n]\n\n[^\n]/;
-const rmarkers = /^[ ]{0,3}([*+-]|\d+[.])\s/gm;
+const omarkers = /^[ ]{0,3}(\d+[.])\s/gm;
+const umarkers = /^[ ]{0,3}([*+-])\s/gm;
 
 function pad(text) {
   return ` ${text} `;
@@ -39,7 +42,11 @@ module.exports.list = function list(chunks, ordered) {
     result = skip(result);
 
     if (digital) {
-      result.after = result.after.replace(rnext, getPrefixedItem);
+      if (ordered) {
+        result.after = result.after.replace(onext, getPrefixedItem);
+      } else {
+        result.after = result.after.replace(unext, getPrefixedItem);
+      }
     }
 
     if (ordered === digital) {
@@ -47,7 +54,11 @@ module.exports.list = function list(chunks, ordered) {
     }
   }
 
-  result.before = result.before.replace(rprevious, beforeReplacer);
+  if (ordered) {
+    result.before = result.before.replace(oprevious, beforeReplacer);
+  } else {
+    result.before = result.before.replace(uprevious, beforeReplacer);
+  }
 
   if (!result.selection) {
     result.selection = '';
@@ -56,12 +67,19 @@ module.exports.list = function list(chunks, ordered) {
   const prefix = nextBullet();
   const spaces = many(' ', prefix.length);
 
-  result.after = result.after.replace(rnext, afterReplacer);
+  if (ordered) {
+    result.after = result.after.replace(onext, afterReplacer);
+  } else {
+    result.after = result.after.replace(unext, afterReplacer);
+  }
+
   result = trim(result, true);
   result = skip(result, { before: beforeSkip, after: afterSkip, any: true });
   result.startTag = prefix;
-  result = wrap(result, settings.lineLength - prefix.length);
-  result.selection = result.selection.replace(/\n/g, `\n${spaces}`);
+  result.selection = result.selection.replace(
+    /\n(?!( - | [0-9]+\. ))/g,
+    `\n${prefix}`
+  );
 
   return compile(result);
 
@@ -81,7 +99,7 @@ module.exports.list = function list(chunks, ordered) {
     return getPrefixedItem(text);
   }
 
-  function nextBullet() {
+  function nextBullet(...args) {
     if (ordered) {
       num += 1;
       return pad(`${num}.`);
@@ -91,6 +109,10 @@ module.exports.list = function list(chunks, ordered) {
   }
 
   function getPrefixedItem(text) {
-    return text.replace(rmarkers, nextBullet);
+    if (ordered) {
+      return text.replace(omarkers, nextBullet);
+    }
+
+    return text.replace(umarkers, nextBullet);
   }
 };

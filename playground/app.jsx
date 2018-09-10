@@ -61,9 +61,9 @@ module.exports = class MyEditor extends React.Component {
               onClick={this.onClickCommand.bind(this, command)}
               aria-label="Bold"
             >
-              <span
+              <i
                 key={`span-${key}`}
-                className={`glyphicon glyphicon-${icon || command}`}
+                className={`fas fa-${icon || command}`}
                 aria-hidden="true"
               />
             </button>
