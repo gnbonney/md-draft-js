@@ -1,8 +1,6 @@
-const many = require('../utils/many');
 const { skip, trim, findTags } = require('../chunks');
 const { compile } = require('../state');
-const { settings } = require('../utils/constants');
-const { wrap, unwrap } = require('./wrapping');
+const { unwrap } = require('./wrapping');
 
 const oprevious = /(\n|^)(([ ]{0,3}(\d+[.])[ \t]+.*)(\n.+|\n{2,}(\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
 const uprevious = /(\n|^)(([ ]{0,3}([*+-])[ \t]+.*)(\n.+|\n{2,}([*+-].*)[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
@@ -65,7 +63,6 @@ module.exports.list = function list(chunks, ordered) {
   }
 
   const prefix = nextBullet();
-  const spaces = many(' ', prefix.length);
 
   if (ordered) {
     result.after = result.after.replace(onext, afterReplacer);
@@ -99,7 +96,7 @@ module.exports.list = function list(chunks, ordered) {
     return getPrefixedItem(text);
   }
 
-  function nextBullet(...args) {
+  function nextBullet() {
     if (ordered) {
       num += 1;
       return pad(`${num}.`);
