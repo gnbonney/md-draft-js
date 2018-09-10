@@ -1,7 +1,8 @@
-import { skip, findTags } from '~/chunks';
-import many from '~/utils/many';
+const { skip, findTags } = require('../chunks');
+const { compile } = require('../state');
+const many = require('../utils/many');
 
-export default function heading(chunks, level) {
+module.exports.heading = function heading(chunks, level) {
   let calculatedLevel = level || 0;
   let result = Object.assign({}, chunks);
 
@@ -18,7 +19,8 @@ export default function heading(chunks, level) {
     calculatedLevel = RegExp.lastMatch.length;
   }
 
-  result.startTag = result.endTag = '';
+  result.endTag = '';
+  result.startTag = '';
   result = findTags(result, null, /\s?(-+|=+)/);
 
   if (!level && /=+/.test(result.endTag)) {
@@ -29,15 +31,16 @@ export default function heading(chunks, level) {
     calculatedLevel = 2;
   }
 
-  result.startTag = result.endTag = '';
+  result.endTag = '';
+  result.startTag = '';
   result = skip(result, { before: 1, after: 1 });
 
-  const levelToCreate = level || (calculatedLevel === 4 ? 1 :
-    calculatedLevel + 1);
+  const levelToCreate =
+    level || (calculatedLevel === 4 ? 1 : calculatedLevel + 1);
 
   if (levelToCreate > 0) {
     result.startTag = `${many('#', levelToCreate)} `;
   }
 
-  return result;
-}
+  return compile(result);
+};

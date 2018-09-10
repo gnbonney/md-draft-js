@@ -1,11 +1,5 @@
-import Editor from '~/component';
-import * as EditorState from '~/state';
-import * as RichUtils from '~/rich';
+const Editor = require('./component');
+const EditorState = require('./state');
+const RichUtils = require('./rich');
 
-export default Editor;
-
-export {
-  Editor,
-  EditorState,
-  RichUtils
-};
+module.exports = { Editor, EditorState, RichUtils };

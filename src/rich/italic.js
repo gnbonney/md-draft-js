@@ -1,11 +1,12 @@
-import { trim } from '~/chunks';
+const { trim } = require('../chunks');
+const { compile } = require('../state');
 
-export default function italic(chunks) {
-  const rleading = /^(_*)/;
-  const rtrailing = /(_*$)/;
-  const rtrailingspace = /(\s?)$/;
-  const rnewlines = /\n{2,}/g;
+const rleading = /^(_*)/;
+const rtrailing = /(_*$)/;
+const rtrailingspace = /(\s?)$/;
+const rnewlines = /\n{2,}/g;
 
+module.exports.italic = function italic(chunks) {
   const result = trim(chunks);
   result.selection = result.selection.replace(rnewlines, '\n');
 
@@ -18,7 +19,8 @@ export default function italic(chunks) {
     result.after = result.after.replace(new RegExp('^_', ''), '');
   } else if (!result.selection && trailDash) {
     result.after = result.after.replace(rleading, '');
-    result.before = result.before.replace(rtrailingspace, '') + trailDash + RegExp.$1;
+    result.before =
+      result.before.replace(rtrailingspace, '') + trailDash + RegExp.$1;
   } else {
     if (!result.selection && !trailDash) {
       result.selection = '';
@@ -29,17 +31,16 @@ export default function italic(chunks) {
     result.after = markup + result.after;
   }
 
-  return result;
-}
+  return compile(result);
+};
 
-export function isItalic(chunks) {
-  const rleading = /^(_*)/;
-  const rtrailing = /(_*$)/;
-  const rnewlines = /\n{2,}/g;
+module.exports.isItalic = function isItalic(chunks) {
   const result = trim(chunks);
   const leadDash = rtrailing.exec(result.before)[0];
   const trailDash = rleading.exec(result.after)[0];
   const fence = Math.min(leadDash.length, trailDash.length);
 
-  return fence >= 1 || (!result.selection.replace(rnewlines, '\n') && trailDash);
-}
+  return (
+    fence >= 1 || (!result.selection.replace(rnewlines, '\n') && trailDash)
+  );
+};

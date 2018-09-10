@@ -1,4 +1,4 @@
-export default function once(fn) {
+module.exports = function once(fn) {
   let disposed;
 
   return function disposable(...args) {
@@ -9,4 +9,4 @@ export default function once(fn) {
     disposed = true;
     fn.apply(this, args);
   };
-}
+};

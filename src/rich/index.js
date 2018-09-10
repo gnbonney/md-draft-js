@@ -1,14 +1,18 @@
-import bold, { isBold } from './bold';
-import italic, { isItalic } from './italic';
-import linkOrMedia from './linkOrMediaOrAttachment';
-import list from './list';
-import quote from './blockquote';
-import code, { isCodeblock } from './codeblock';
-import notebook from './notebook';
-import heading from './heading';
-import hr from './hr';
+const { bold, isBold } = require('./bold');
+const { italic, isItalic } = require('./italic');
+const { linkOrMediaOrAttachment } = require('./linkOrMediaOrAttachment');
+const { list } = require('./list');
+const { blockquote } = require('./blockquote');
+const { codeblock, isCodeblock } = require('./codeblock');
+const { notebook } = require('./notebook');
+const { heading } = require('./heading');
+const { hr } = require('./hr');
 
-export function applyCommand(editorState, command, metadata) {
+module.exports.applyCommand = function applyCommand(
+  editorState,
+  command,
+  metadata
+) {
   const state = Object.assign({}, editorState, { focus: true });
 
   switch (command) {
@@ -19,9 +23,9 @@ export function applyCommand(editorState, command, metadata) {
     case 'hr':
       return hr(state);
     case 'quote':
-      return quote(state);
+      return blockquote(state);
     case 'code':
-      return code(state);
+      return codeblock(state);
     case 'notebook':
       return notebook(state, metadata);
     case 'ul':
@@ -31,15 +35,15 @@ export function applyCommand(editorState, command, metadata) {
     case 'heading':
       return heading(state, metadata);
     case 'link':
-      return linkOrMedia(state, metadata, 'link');
+      return linkOrMediaOrAttachment(state, metadata, 'link');
     case 'media':
-      return linkOrMedia(state, metadata, 'media');
+      return linkOrMediaOrAttachment(state, metadata, 'media');
     default:
       return state;
   }
-}
+};
 
-export function isApplied(state, command) {
+module.exports.isApplied = function isApplied(state, command) {
   switch (command) {
     case 'bold':
       return isBold(state);
@@ -50,4 +54,4 @@ export function isApplied(state, command) {
     default:
       return false;
   }
-}
+};

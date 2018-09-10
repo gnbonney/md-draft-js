@@ -1,4 +1,3 @@
-/* eslint-disable global-require */
 /* eslint-disable import/no-extraneous-dependencies */
 const path = require('path');
 const webpack = require('webpack');
@@ -7,43 +6,39 @@ const rootPath = __dirname;
 
 module.exports = {
   devtool: 'eval-source-map',
-
-  entry: [
-    './playground/index.js'
-  ],
-
+  entry: ['./playground/index.js'],
   output: {
     filename: 'bundle.js',
     sourceMapFilename: 'bundle.js.map',
     path: '/',
     publicPath: '/assets/'
   },
-
   devServer: {
     hot: true
   },
-
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
-
+  mode: 'development',
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loaders: [
-        'babel'
-      ],
-      include: [
-        path.join(rootPath, 'playground'),
-        path.join(rootPath, 'src')
-      ]
-    }, {
-      test: /\.json$/,
-      loaders: [
-        'json-loader'
-      ]
-    }]
+    rules: [
+      {
+        test: /\.jsx$/,
+        include: path.join(rootPath, 'playground'),
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-env',
+              {
+                targets: {
+                  browsers: 'last 2 versions, ie 11'
+                }
+              }
+            ],
+            '@babel/preset-react'
+          ]
+        }
+      }
+    ]
   }
 };
-/* eslint-enable global-require */
 /* eslint-enable import/no-extraneous-dependencies */

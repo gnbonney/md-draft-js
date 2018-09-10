@@ -1,18 +1,20 @@
-import many from '~/utils/many';
-import { skip, trim, findTags } from '~/chunks';
-import { settings } from '~/utils/constants';
-import { wrap, unwrap } from './wrapping';
+const many = require('../utils/many');
+const { skip, trim, findTags } = require('../chunks');
+const { compile } = require('../state');
+const { settings } = require('../utils/constants');
+const { wrap, unwrap } = require('./wrapping');
 
 const rprevious = /(\n|^)(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
 const rnext = /^\n*(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*/;
 const rbullettype = /^\s*([*+-])/;
 const rskipper = /[^\n]\n\n[^\n]/;
+const rmarkers = /^[ ]{0,3}([*+-]|\d+[.])\s/gm;
 
 function pad(text) {
   return ` ${text} `;
 }
 
-export default function list(chunks, ordered) {
+module.exports.list = function list(chunks, ordered) {
   let bullet = '-';
   let num = 0;
   let digital;
@@ -20,7 +22,11 @@ export default function list(chunks, ordered) {
   let afterSkip = 1;
   let result = findTags(chunks, /(\n|^)*[ ]{0,3}([*+-]|\d+[.])\s+/);
 
-  if (result.before && !/\n$/.test(result.before) && !/^\n/.test(result.startTag)) {
+  if (
+    result.before &&
+    !/\n$/.test(result.before) &&
+    !/^\n/.test(result.startTag)
+  ) {
     result.before += result.startTag;
     result.startTag = '';
   }
@@ -37,7 +43,7 @@ export default function list(chunks, ordered) {
     }
 
     if (ordered === digital) {
-      return result;
+      return compile(result);
     }
   }
 
@@ -57,7 +63,7 @@ export default function list(chunks, ordered) {
   result = wrap(result, settings.lineLength - prefix.length);
   result.selection = result.selection.replace(/\n/g, `\n${spaces}`);
 
-  return result;
+  return compile(result);
 
   function beforeReplacer(text) {
     if (rbullettype.test(text)) {
@@ -85,7 +91,6 @@ export default function list(chunks, ordered) {
   }
 
   function getPrefixedItem(text) {
-    const rmarkers = /^[ ]{0,3}([*+-]|\d+[.])\s/gm;
     return text.replace(rmarkers, nextBullet);
   }
-}
+};

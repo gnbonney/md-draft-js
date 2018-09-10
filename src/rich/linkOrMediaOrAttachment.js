@@ -1,12 +1,13 @@
-import parseLinkInput from 'parse-link-input';
-import { trim, findTags } from '~/chunks';
+const parseLinkInput = require('parse-link-input');
+const { trim, findTags } = require('../chunks');
+const { compile } = require('../state');
 
 const rdefinitions = /^[ ]{0,3}\[((?:attachment-)?\d+)]:[ \t]*\n?[ \t]*<?(\S+?)>?[ \t]*\n?[ \t]*(?:(\n*)["(](.+?)[")][ \t]*)?(?:\n+|$)/gm;
 const rattachment = /^attachment-(\d+)$/i;
+const regex = /(\[)((?:\[[^\]]*\]|[^[\]])*)(\][ ]?(?:\n[ ]*)?\[)((?:attachment-)?\d+)(\])/g;
 
 function pushDefinition({ chunks, definition, attachment }) {
   let anchor = 0;
-  const regex = /(\[)((?:\[[^\]]*\]|[^[\]])*)(\][ ]?(?:\n[ ]*)?\[)((?:attachment-)?\d+)(\])/g;
   const definitions = {};
   const footnotes = [];
   const result = Object.assign({}, chunks);
@@ -76,7 +77,10 @@ function pushDefinition({ chunks, definition, attachment }) {
   function pushAnchor(anchorDefinition) {
     anchor += 1;
     // eslint-disable-next-line no-param-reassign
-    anchorDefinition = anchorDefinition.replace(/^[ ]{0,3}\[(attachment-)?(\d+)]:/, `  [$1${anchor}]:`);
+    anchorDefinition = anchorDefinition.replace(
+      /^[ ]{0,3}\[(attachment-)?(\d+)]:/,
+      `  [$1${anchor}]:`
+    );
     footnotes.push(anchorDefinition);
   }
 
@@ -93,9 +97,13 @@ function pushDefinition({ chunks, definition, attachment }) {
   }
 }
 
-export default function linkOrMediaOrAttachment(chunks, url, type) {
+module.exports.linkOrMediaOrAttachment = function linkOrMediaOrAttachment(
+  chunks,
+  url,
+  type
+) {
   if (!url) {
-    return chunks;
+    return compile(chunks);
   }
 
   const media = type === 'media';
@@ -104,21 +112,26 @@ export default function linkOrMediaOrAttachment(chunks, url, type) {
   if (result.endTag.length > 1 && result.startTag.length > 0) {
     result.startTag = result.startTag.replace(/!?\[/, '');
     result.endTag = '';
+    // eslint-disable-next-line prefer-destructuring
     result = pushDefinition({ chunks: result }).result;
 
-    return result;
+    return compile(result);
   }
 
   result.selection = result.startTag + result.selection + result.endTag;
-  result.startTag = result.endTag = '';
+  result.endTag = '';
+  result.startTag = '';
 
   if (/\n\n/.test(result.selection)) {
+    // eslint-disable-next-line prefer-destructuring
     result = pushDefinition({ chunks: result }).result;
 
-    return result;
+    return compile(result);
   }
 
-  result.selection = (` ${result.selection}`).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, '$1\\').substr(1);
+  result.selection = ` ${result.selection}`
+    .replace(/([^\\](?:\\\\)*)(?=[[\]])/g, '$1\\')
+    .substr(1);
   const link = parseLinkInput(url);
   const key = link.attachment ? '  [attachment-9999]: ' : ' [9999]: ';
   const definition = key + link.href + (link.title ? ` "${link.title}"` : '');
@@ -127,15 +140,16 @@ export default function linkOrMediaOrAttachment(chunks, url, type) {
     definition,
     attachment: link.attachment
   });
-  const anchor = definitionResult.anchor;
+  const { anchor } = definitionResult;
 
+  // eslint-disable-next-line prefer-destructuring
   result = definitionResult.result;
 
   if (!link.attachment) {
     add();
   }
 
-  return result;
+  return compile(result);
 
   function add() {
     result.startTag = media ? '![' : '[';
@@ -145,4 +159,4 @@ export default function linkOrMediaOrAttachment(chunks, url, type) {
       result.selection = '';
     }
   }
-}
+};

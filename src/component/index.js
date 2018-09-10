@@ -1,30 +1,12 @@
-import isKeyCombo from 'is-key-combo';
-import React from 'react';
-import PropTypes from 'prop-types';
-import { commands } from '~/utils/constants';
-import { getChunks } from '~/chunks';
-import { setSelection } from '~/utils/selection';
-import { getText } from '~/state';
+const isKeyCombo = require('is-key-combo');
+const React = require('react');
+const PropTypes = require('prop-types');
+const { commands } = require('../utils/constants');
+const { getChunks } = require('../chunks');
+const { setSelection } = require('../utils/selection');
+const { getText } = require('../state');
 
-export default class Editor extends React.Component {
-  static defaultProps = {
-    content: '',
-    name: 'content',
-    onChange: () => {},
-    onKeyCommand: () => {},
-    commands
-  };
-
-  static propTypes = {
-    autoFocus: PropTypes.bool,
-    editorState: PropTypes.object,
-    className: PropTypes.string,
-    name: PropTypes.string,
-    onChange: PropTypes.func,
-    onKeyCommand: PropTypes.func,
-    commands: PropTypes.array
-  };
-
+class Editor extends React.Component {
   constructor(props) {
     super(props);
 
@@ -33,16 +15,12 @@ export default class Editor extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    const props = [
-      'before',
-      'after',
-      'startTag',
-      'endTag',
-      'selection'
-    ];
+    const props = ['before', 'after', 'startTag', 'endTag', 'selection'];
 
-    return nextProps.className !== this.props.className ||
-      props.some(prop => nextProps.editorState[prop] !== this.props[prop]);
+    return (
+      nextProps.className !== this.props.className ||
+      props.some((prop) => nextProps.editorState[prop] !== this.props[prop])
+    );
   }
 
   componentDidUpdate() {
@@ -66,26 +44,42 @@ export default class Editor extends React.Component {
   }
 
   render() {
-    const {
-      autoFocus,
-      name,
-      editorState
-    } = this.props;
+    const { autoFocus, name, editorState } = this.props;
     const text = getText(editorState);
 
-    return (
-      <textarea
-        data-test-id="editor-text-area"
-        autoFocus={autoFocus}
-        ref={(c) => { this.textarea = c; }}
-        id={name}
-        name={name}
-        value={text}
-        className={this.props.className}
-        onKeyDown={this.handleKeyDown}
-        onChange={this.handleChange}
-        onSelect={this.handleChange}
-      />
-    );
+    return React.createElement('textarea', {
+      'data-test-id': 'editor-text-area',
+      autoFocus,
+      ref: (c) => {
+        this.textarea = c;
+      },
+      id: name,
+      name,
+      value: text,
+      className: this.props.className,
+      onKeyDown: this.handleKeyDown,
+      onChange: this.handleChange,
+      onSelect: this.handleChange
+    });
   }
 }
+
+Editor.defaultProps = {
+  content: '',
+  name: 'content',
+  onChange: () => {},
+  onKeyCommand: () => {},
+  commands
+};
+
+Editor.propTypes = {
+  autoFocus: PropTypes.bool,
+  editorState: PropTypes.object,
+  className: PropTypes.string,
+  name: PropTypes.string,
+  onChange: PropTypes.func,
+  onKeyCommand: PropTypes.func,
+  commands: PropTypes.array
+};
+
+module.exports = Editor;

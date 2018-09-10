@@ -1,6 +1,6 @@
-import { applyCommand } from '~/rich';
-import { createWithContent } from '~/state';
-import { expect } from 'chai';
+const { expect } = require('chai');
+const { applyCommand } = require('../../src/rich');
+const { createWithContent } = require('../../src/state');
 
 describe('link enrichment', () => {
   it('should add a link', () => {
@@ -9,11 +9,9 @@ describe('link enrichment', () => {
     });
     const result = applyCommand(state, 'link', 'bar');
 
-    expect(result.before).to.eql('');
-    expect(result.after).to.eql('\n\n  [1]: http://bar');
+    expect(result.before).to.eql('[');
+    expect(result.after).to.eql('][1]\n\n  [1]: http://bar');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('[');
-    expect(result.endTag).to.eql('][1]');
   });
 
   it('should add a second link', () => {
@@ -24,11 +22,11 @@ describe('link enrichment', () => {
     });
     const result = applyCommand(state, 'link', 'quux');
 
-    expect(result.before).to.eql('[foo][1] ');
-    expect(result.after).to.eql('\n\n  [1]: http://baz\n  [2]: http://quux');
+    expect(result.before).to.eql('[foo][1] [');
+    expect(result.after).to.eql(
+      '][2]\n\n  [1]: http://baz\n  [2]: http://quux'
+    );
     expect(result.selection).to.eql('bar');
-    expect(result.startTag).to.eql('[');
-    expect(result.endTag).to.eql('][2]');
   });
 
   it('should do nothing', () => {

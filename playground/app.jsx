@@ -1,12 +1,12 @@
-import classNames from 'classnames';
-import React from 'react';
-import commands from './commands';
-import { Editor, EditorState, RichUtils } from '../src';
-import { isApplied } from '~/rich';
+const classNames = require('classnames');
+const React = require('react');
+const commands = require('./commands');
+const { Editor, EditorState, RichUtils } = require('../src');
+const { isApplied } = require('../src/rich');
 
 const content = '# Sample title\n\nYour content goes here.';
 
-export default class MyEditor extends React.Component {
+module.exports = class MyEditor extends React.Component {
   constructor(props) {
     super(props);
 
@@ -31,7 +31,9 @@ export default class MyEditor extends React.Component {
     const link = global.prompt('Link URL:');
 
     if (link) {
-      this.onChange(RichUtils.applyCommand(this.state.editorState, 'link', link));
+      this.onChange(
+        RichUtils.applyCommand(this.state.editorState, 'link', link)
+      );
     }
   }
 
@@ -39,7 +41,9 @@ export default class MyEditor extends React.Component {
     const image = global.prompt('Image URL:');
 
     if (image) {
-      this.onChange(RichUtils.applyCommand(this.state.editorState, 'media', image));
+      this.onChange(
+        RichUtils.applyCommand(this.state.editorState, 'media', image)
+      );
     }
   }
 
@@ -50,7 +54,10 @@ export default class MyEditor extends React.Component {
           {commands.map(({ command, label, icon }, key) => (
             <button
               key={key}
-              className={classNames('editor-action', isApplied(this.state.editorState, command) ? 'active' : '')}
+              className={classNames(
+                'editor-action',
+                isApplied(this.state.editorState, command) ? 'active' : ''
+              )}
               onClick={this.onClickCommand.bind(this, command)}
               aria-label="Bold"
             >
@@ -66,20 +73,14 @@ export default class MyEditor extends React.Component {
             onClick={this.onLinkClick.bind(this)}
             aria-label="Link"
           >
-            <span
-              className="glyphicon glyphicon-link"
-              aria-hidden="true"
-            />
+            <span className="glyphicon glyphicon-link" aria-hidden="true" />
           </button>
           <button
             className="editor-action"
             onClick={this.onImageClick.bind(this)}
             aria-label="Image"
           >
-            <span
-              className="glyphicon glyphicon-picture"
-              aria-hidden="true"
-            />
+            <span className="glyphicon glyphicon-picture" aria-hidden="true" />
           </button>
         </div>
         <Editor
@@ -92,4 +93,4 @@ export default class MyEditor extends React.Component {
       </div>
     );
   }
-}
+};

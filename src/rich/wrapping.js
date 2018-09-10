@@ -1,9 +1,18 @@
-const prefixes = '(?:\\s{4,}|\\s*>|\\s*-\\s+|\\s*\\d+\\.|=|\\+|-|_|\\*|#|\\s*\\[[^\n]]+\\]:)';
+const prefixes =
+  '(?:\\s{4,}|\\s*>|\\s*-\\s+|\\s*\\d+\\.|=|\\+|-|_|\\*|#|\\s*\\[[^\n]]+\\]:)';
 const rleadingprefixes = new RegExp(`^${prefixes}`, '');
 const rtext = new RegExp(`([^\\n])\\n(?!(\\n|${prefixes}))`, 'g');
 const rtrailingspaces = /\s+$/;
 
-export function wrap(chunks, len) {
+function unwrap(chunks) {
+  rtext.lastIndex = 0;
+
+  return Object.assign({}, chunks, {
+    selection: chunks.selection.replace(rtext, '$1 $2')
+  });
+}
+
+function wrap(chunks, len) {
   const regex = new RegExp(`(.{1,${len}})( +|$\\n?)`, 'gm');
 
   const result = unwrap(chunks);
@@ -18,8 +27,5 @@ export function wrap(chunks, len) {
   }
 }
 
-export function unwrap(chunks) {
-  rtext.lastIndex = 0;
-
-  return Object.assign({}, chunks, { selection: chunks.selection.replace(rtext, '$1 $2') });
-}
+module.exports.wrap = wrap;
+module.exports.unwrap = unwrap;

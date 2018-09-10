@@ -1,10 +1,11 @@
-import { skip } from '~/chunks';
+const { skip } = require('../chunks');
+const { compile } = require('../state');
 
-export default function hr(chunks) {
+module.exports.hr = function hr(chunks) {
   const result = Object.assign({}, chunks);
 
   result.startTag = '----------\n';
   result.selection = '';
 
-  return skip(result, { left: 2, right: 1, any: true });
-}
+  return compile(skip(result, { left: 2, right: 1, any: true }));
+};

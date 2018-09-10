@@ -1,4 +1,14 @@
-export function createEmpty() {
+function compile({ before, after, startTag, endTag, ...props }) {
+  return {
+    before: before + startTag,
+    after: endTag + after,
+    startTag: '',
+    endTag: '',
+    ...props
+  };
+}
+
+function createEmpty() {
   return {
     before: '',
     after: '',
@@ -12,7 +22,7 @@ export function createEmpty() {
   };
 }
 
-export function createWithContent(initialState) {
+function createWithContent(initialState) {
   let result;
 
   if (!initialState) {
@@ -28,10 +38,13 @@ export function createWithContent(initialState) {
   return Object.assign(createEmpty(), result);
 }
 
-export function getText(state) {
-  return state.before +
-    state.startTag +
-    state.selection +
-    state.endTag +
-    state.after;
+function getText(state) {
+  return (
+    state.before + state.startTag + state.selection + state.endTag + state.after
+  );
 }
+
+module.exports.compile = compile;
+module.exports.createEmpty = createEmpty;
+module.exports.createWithContent = createWithContent;
+module.exports.getText = getText;

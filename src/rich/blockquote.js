@@ -1,6 +1,7 @@
-import { settings } from '~/utils/constants';
-import { skip } from '~/chunks';
-import { wrap, unwrap } from './wrapping';
+const { settings } = require('../utils/constants');
+const { skip } = require('../chunks');
+const { compile } = require('../state');
+const { wrap, unwrap } = require('./wrapping');
 
 const rtrailblankline = /(>[ \t]*)$/;
 const rleadblankline = /^(>[ \t]*)/;
@@ -9,14 +10,17 @@ const rendtag = /^(((\n|^)(\n[ \t]*)*>(.+\n)*.*)+(\n[ \t]*)*)/;
 const rleadbracket = /^\n((>|\s)*)\n/;
 const rtrailbracket = /\n((>|\s)*)\n$/;
 
-export default function blockquote(chunks) {
+module.exports.blockquote = function blockquote(chunks) {
   let match = '';
   let leftOver = '';
   let line;
   let result = Object.assign({}, chunks);
 
   result.selection = result.selection.replace(rnewlinefencing, newlinereplacer);
-  result.before = result.before.replace(rtrailblankline, trailBlankLineReplacer);
+  result.before = result.before.replace(
+    rtrailblankline,
+    trailBlankLineReplacer
+  );
   result.selection = result.selection.replace(/^(\s|>)+$/, '');
   result.selection = result.selection || '';
 
@@ -56,10 +60,13 @@ export default function blockquote(chunks) {
   }
 
   if (!/\n/.test(result.selection)) {
-    result.selection = result.selection.replace(rleadblankline, leadBlankLineReplacer);
+    result.selection = result.selection.replace(
+      rleadblankline,
+      leadBlankLineReplacer
+    );
   }
 
-  return result;
+  return compile(result);
 
   function newlinereplacer(all, before, text, after) {
     result.before += before;
@@ -138,4 +145,4 @@ export default function blockquote(chunks) {
       return `\n${markdown.replace(/^[ ]{0,3}>?[ \t]*$/gm, replacement)}\n`;
     }
   }
-}
+};

@@ -1,4 +1,5 @@
-import { skip, trim, findTags } from '~/chunks';
+const { skip, trim, findTags } = require('../chunks');
+const { compile } = require('../state');
 
 const rtextbefore = /\S[ ]*$/;
 const rtextafter = /^[ ]*\S/;
@@ -9,30 +10,34 @@ const rfencebeforeinside = /^```[a-z]*\n/;
 const rfenceafter = /^\n?```/;
 const rfenceafterinside = /\n```$/;
 
-export default function codeblock(chunks) {
+module.exports.codeblock = function codeblock(chunks) {
   const newlined = rnewline.test(chunks.selection);
   const trailing = rtextafter.test(chunks.after);
   const leading = rtextbefore.test(chunks.before);
-  const outfenced = rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
+  const outfenced =
+    rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
 
   if (outfenced || newlined || !(leading || trailing)) {
     return block(chunks, outfenced);
   }
-  return inline(chunks);
-}
 
-export function isCodeblock(chunks) {
-  const outfenced = rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
+  return inline(chunks);
+};
+
+module.exports.isCodeblock = function isCodeblock(chunks) {
+  const outfenced =
+    rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
 
   return outfenced;
-}
+};
 
 function inline(chunks) {
   let result = trim(chunks);
   result = findTags(result, rbacktick, rbacktick);
 
   if (!result.startTag && !result.endTag) {
-    result.startTag = result.endTag = '`';
+    result.endTag = '`';
+    result.startTag = '`';
 
     if (!result.selection) {
       result.selection = '';
@@ -41,10 +46,11 @@ function inline(chunks) {
     result.before += result.endTag;
     result.endTag = '';
   } else {
-    result.startTag = result.endTag = '';
+    result.endTag = '';
+    result.startTag = '';
   }
 
-  return result;
+  return compile(result);
 }
 
 function block(chunks, outfenced) {
@@ -54,7 +60,7 @@ function block(chunks, outfenced) {
     result.before = result.before.replace(rfencebefore, '');
     result.after = result.after.replace(rfenceafter, '');
 
-    return result;
+    return compile(result);
   }
 
   result.before = result.before.replace(/[ ]{4}|```[a-z]*\n$/, mergeSelection);
@@ -67,16 +73,22 @@ function block(chunks, outfenced) {
     result.startTag = '```\n';
     result.endTag = '\n```';
     result.selection = '';
-  } else if (rfencebeforeinside.test(result.selection) && rfenceafterinside.test(result.selection)) {
+  } else if (
+    rfencebeforeinside.test(result.selection) &&
+    rfenceafterinside.test(result.selection)
+  ) {
     result.selection = result.selection.replace(/(^```[a-z]*\n)|(```$)/g, '');
   } else if (/^[ ]{0,3}\S/m.test(result.selection)) {
     result.before += '```\n';
     result.after = `\n\`\`\`${result.after}`;
   } else {
-    result.selection = result.selection.replace(/^(?:[ ]{4}|[ ]{0,3}\t|```[a-z]*)/gm, '');
+    result.selection = result.selection.replace(
+      /^(?:[ ]{4}|[ ]{0,3}\t|```[a-z]*)/gm,
+      ''
+    );
   }
 
-  return result;
+  return compile(result);
 
   function mergeSelection(all) {
     result.selection = all + result.selection;

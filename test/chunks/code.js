@@ -1,6 +1,6 @@
-import { applyCommand } from '~/rich';
-import { createWithContent } from '~/state';
-import { expect } from 'chai';
+const { expect } = require('chai');
+const { applyCommand } = require('../../src/rich');
+const { createWithContent } = require('../../src/state');
 
 describe('code enrichment', () => {
   it('should apply code', () => {
@@ -11,11 +11,9 @@ describe('code enrichment', () => {
     });
     const result = applyCommand(state, 'code');
 
-    expect(result.startTag).to.eql('`');
-    expect(result.endTag).to.eql('`');
-    expect(result.before).to.eql('foo ');
+    expect(result.before).to.eql('foo `');
     expect(result.selection).to.eql('bar');
-    expect(result.after).to.eql(' baz');
+    expect(result.after).to.eql('` baz');
   });
 
   it('should remove code', () => {
@@ -39,11 +37,9 @@ describe('code enrichment', () => {
     });
     const result = applyCommand(state, 'code');
 
-    expect(result.startTag).to.eql('```\n');
-    expect(result.endTag).to.eql('\n```');
-    expect(result.before).to.eql('foo\n\n');
+    expect(result.before).to.eql('foo\n\n```\n');
     expect(result.selection).to.eql('');
-    expect(result.after).to.eql('\n\nbaz');
+    expect(result.after).to.eql('\n```\n\nbaz');
   });
 
   it('should remove code block', () => {

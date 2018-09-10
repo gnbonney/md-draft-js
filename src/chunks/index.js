@@ -1,12 +1,14 @@
-import many from '~/utils/many';
-import fixEOL from '~/utils/fixEOL';
-import { getSelection } from '~/utils/selection';
-import extendRegExp from './extendRegExp';
+const many = require('../utils/many');
+const fixEOL = require('../utils/fixEOL');
+const { getSelection } = require('../utils/selection');
+const extendRegExp = require('./extendRegExp');
 
-export function getChunks(textarea) {
+module.exports.getChunks = function getChunks(textarea) {
   const selectionInfo = getSelection(textarea);
   const before = fixEOL(textarea.value.substring(0, selectionInfo.start));
-  const selection = fixEOL(textarea.value.substring(selectionInfo.start, selectionInfo.end));
+  const selection = fixEOL(
+    textarea.value.substring(selectionInfo.start, selectionInfo.end)
+  );
   const after = fixEOL(textarea.value.substring(selectionInfo.end));
 
   return {
@@ -19,9 +21,9 @@ export function getChunks(textarea) {
     text: textarea.value,
     focus: false
   };
-}
+};
 
-export function findTags(state, startRegex, endRegex) {
+module.exports.findTags = function findTags(state, startRegex, endRegex) {
   let regex;
   const result = Object.assign({}, state);
 
@@ -52,9 +54,9 @@ export function findTags(state, startRegex, endRegex) {
 
     return '';
   }
-}
+};
 
-export function skip(state, options) {
+module.exports.skip = function skip(state, options) {
   const o = options || {};
   const result = Object.assign({}, state);
   let beforeCount = 'before' in o ? o.before : 1;
@@ -87,9 +89,9 @@ export function skip(state, options) {
 
     return text.replace(new RegExp(regex + suffix), replacement);
   }
-}
+};
 
-export function trim(state, remove) {
+module.exports.trim = function trim(state, remove) {
   const result = Object.assign({}, state);
 
   result.selection = result.selection
@@ -99,10 +101,12 @@ export function trim(state, remove) {
   return result;
 
   function beforeReplacer(text) {
-    result.before += text; return '';
+    result.before += text;
+    return '';
   }
 
   function afterReplacer(text) {
-    result.after = text + result.after; return '';
+    result.after = text + result.after;
+    return '';
   }
-}
+};

@@ -1,6 +1,6 @@
-import { applyCommand } from '~/rich';
-import { createWithContent } from '~/state';
-import { expect } from 'chai';
+const { expect } = require('chai');
+const { applyCommand } = require('../../src/rich');
+const { createWithContent } = require('../../src/state');
 
 describe('bold enrichment', () => {
   it('should apply bold', () => {

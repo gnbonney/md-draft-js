@@ -1,4 +1,5 @@
-import { skip } from '~/chunks';
+const { skip } = require('../chunks');
+const { compile } = require('../state');
 
 const rtextbefore = /\S[ ]*$/;
 const rtextafter = /^[ ]*\S/;
@@ -8,18 +9,24 @@ const rfencebeforeinside = /^```notebook\n/;
 const rfenceafter = /^\n?```/;
 const rfenceafterinside = /\n```$/;
 
-export default function notebook(chunks, metadata) {
+module.exports.notebook = function notebook(chunks, metadata) {
   const newlined = rnewline.test(chunks.selection);
   const trailing = rtextafter.test(chunks.after);
   const leading = rtextbefore.test(chunks.before);
-  const outfenced = rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
+  const outfenced =
+    rfencebefore.test(chunks.before) && rfenceafter.test(chunks.after);
 
   if (outfenced || newlined || !(leading || trailing)) {
     return block(chunks, outfenced, metadata);
   }
 
-  return Object.assign({}, chunks, { startTag: '\n```notebook\n', endTag: '```\n' });
-}
+  return compile(
+    Object.assign({}, chunks, {
+      startTag: '\n```notebook\n',
+      endTag: '```\n'
+    })
+  );
+};
 
 function block(chunks, outfenced, metadata) {
   let result = Object.assign({}, chunks);
@@ -28,7 +35,7 @@ function block(chunks, outfenced, metadata) {
     result.before = result.before.replace(rfencebefore, '');
     result.after = result.after.replace(rfenceafter, '');
 
-    return result;
+    return compile(result);
   }
 
   result.before = result.before.replace(/[ ]{4}|```[a-z]*\n$/, mergeSelection);
@@ -41,16 +48,22 @@ function block(chunks, outfenced, metadata) {
     result.startTag = '```notebook\n';
     result.endTag = '\n```';
     result.selection = metadata || '';
-  } else if (rfencebeforeinside.test(result.selection) && rfenceafterinside.test(result.selection)) {
+  } else if (
+    rfencebeforeinside.test(result.selection) &&
+    rfenceafterinside.test(result.selection)
+  ) {
     result.selection = result.selection.replace(/(^```[a-z]*\n)|(```$)/g, '');
   } else if (/^[ ]{0,3}\S/m.test(result.selection)) {
     result.before += '```notebook\n';
     result.after = `\n\`\`\`${result.after}`;
   } else {
-    result.selection = result.selection.replace(/^(?:[ ]{4}|[ ]{0,3}\t|```[a-z]*)/gm, '');
+    result.selection = result.selection.replace(
+      /^(?:[ ]{4}|[ ]{0,3}\t|```[a-z]*)/gm,
+      ''
+    );
   }
 
-  return result;
+  return compile(result);
 
   function mergeSelection(all) {
     result.selection = all + result.selection;

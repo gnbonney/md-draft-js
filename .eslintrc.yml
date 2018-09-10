@@ -1,41 +1,12 @@
-extends: airbnb
-
-settings:
-  import/resolver: babel-root-import
+extends: ["eslint-config-airbnb-base", "plugin:prettier/recommended"]
 
 env:
   node: true
-
-parser: "babel-eslint"
-
-parserOptions:
-  ecmaFeatures:
-    experimentalObjectRestSpread: true
+  es6: true
+  mocha: true
 
 rules:
-  react/jsx-filename-extension:
+  prefer-arrow-callback:
     - 0
-  react/forbid-prop-types:
-    - 0
-  import/prefer-default-export:
-    - 0
-  import/no-unresolved:
-    - 0
-  import/extensions:
-    - 2
-    - never
-  no-multiple-empty-lines:
-    - 2
-    - max: 1
-      maxEOF: 0
-  comma-dangle:
-    - error
-    - never
-  max-len:
-    - 2
-    - code: 150
-  no-confusing-arrow:
-    - error
-    - allowParens: true
+  no-return-assign: 0
   no-use-before-define: off
-  eol-last: error

@@ -1,14 +1,14 @@
-import { applyCommand } from '~/rich';
-import { createWithContent, getText } from '~/state';
-import { expect } from 'chai';
+const { expect } = require('chai');
+const { applyCommand } = require('../../src/rich');
+const { createWithContent, getText } = require('../../src/state');
 
 describe('heading enrichment', () => {
   it('should create an h1 after text', () => {
     const state = createWithContent('foo');
     const result = applyCommand(state, 'heading');
 
-    expect(result.before).to.eql('foo\n\n');
-    expect(result.startTag).to.eql('# ');
+    expect(result.before).to.eql('foo\n\n# ');
+    expect(result.selection).to.eql('');
     expect(result.after).to.eql('');
   });
 
@@ -18,8 +18,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading');
 
+    expect(result.before).to.eql('# ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('# ');
+    expect(result.after).to.eql('');
   });
 
   it('should create an h2 for selected text', () => {
@@ -29,8 +30,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading');
 
+    expect(result.before).to.eql('## ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('## ');
+    expect(result.after).to.eql('');
   });
 
   it('should create an h1 when selected text is h4', () => {
@@ -40,8 +42,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading');
 
+    expect(result.before).to.eql('# ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('# ');
+    expect(result.after).to.eql('');
   });
 
   it('should create an h1 when having an h1 before', () => {
@@ -51,9 +54,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading');
 
-    expect(result.before).to.eql('# title1\n\n');
+    expect(result.before).to.eql('# title1\n\n# ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('# ');
+    expect(result.after).to.eql('');
   });
 
   it('should create an h1 when having an h1 and text before', () => {
@@ -63,9 +66,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading');
 
-    expect(result.before).to.eql('asd\n\n# title1\n\n');
+    expect(result.before).to.eql('asd\n\n# title1\n\n# ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('# ');
+    expect(result.after).to.eql('');
   });
 
   it('should create an h4 for selected text', () => {
@@ -74,8 +77,9 @@ describe('heading enrichment', () => {
     });
     const result = applyCommand(state, 'heading', 4);
 
+    expect(result.before).to.eql('#### ');
     expect(result.selection).to.eql('foo');
-    expect(result.startTag).to.eql('#### ');
+    expect(result.after).to.eql('');
     expect(getText(result)).to.eql('#### foo');
   });
 });

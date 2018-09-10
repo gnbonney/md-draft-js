@@ -1,11 +1,12 @@
-import { trim } from '~/chunks';
+const { trim } = require('../chunks');
+const { compile } = require('../state');
 
-export default function bold(chunks) {
-  const rleading = /^(\**)/;
-  const rtrailing = /(\**$)/;
-  const rtrailingspace = /(\s?)$/;
-  const rnewlines = /\n{2,}/g;
+const rleading = /^(\**)/;
+const rtrailing = /(\**$)/;
+const rtrailingspace = /(\s?)$/;
+const rnewlines = /\n{2,}/g;
 
+module.exports.bold = function bold(chunks) {
   const result = trim(chunks);
 
   result.selection = result.selection.replace(rnewlines, '\n');
@@ -20,7 +21,8 @@ export default function bold(chunks) {
     result.after = result.after.replace(new RegExp(`^${stars}`, ''), '');
   } else if (!result.selection && trailStars) {
     result.after = result.after.replace(rleading, '');
-    result.before = result.before.replace(rtrailingspace, '') + trailStars + RegExp.$1;
+    result.before =
+      result.before.replace(rtrailingspace, '') + trailStars + RegExp.$1;
   } else {
     if (!result.selection && !trailStars) {
       result.selection = '';
@@ -31,17 +33,16 @@ export default function bold(chunks) {
     result.after = markup + result.after;
   }
 
-  return result;
-}
+  return compile(result);
+};
 
-export function isBold(chunks) {
-  const rleading = /^(\**)/;
-  const rtrailing = /(\**$)/;
-  const rnewlines = /\n{2,}/g;
+module.exports.isBold = function isBold(chunks) {
   const result = trim(chunks);
   const leadStars = rtrailing.exec(result.before)[0];
   const trailStars = rleading.exec(result.after)[0];
   const fence = Math.min(leadStars.length, trailStars.length);
 
-  return fence >= 2 || (!result.selection.replace(rnewlines, '\n') && trailStars);
-}
+  return (
+    fence >= 2 || (!result.selection.replace(rnewlines, '\n') && trailStars)
+  );
+};

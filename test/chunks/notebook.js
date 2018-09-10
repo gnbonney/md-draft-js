@@ -1,6 +1,6 @@
-import { applyCommand } from '~/rich';
-import { createWithContent } from '~/state';
-import { expect } from 'chai';
+const { expect } = require('chai');
+const { applyCommand } = require('../../src/rich');
+const { createWithContent } = require('../../src/state');
 
 describe('notebook enrichment', () => {
   it('should apply notebook block', () => {
@@ -11,11 +11,9 @@ describe('notebook enrichment', () => {
     });
     const result = applyCommand(state, 'notebook');
 
-    expect(result.startTag).to.eql('```notebook\n');
-    expect(result.endTag).to.eql('\n```');
-    expect(result.before).to.eql('foo\n\n');
+    expect(result.before).to.eql('foo\n\n```notebook\n');
     expect(result.selection).to.eql('');
-    expect(result.after).to.eql('\n\nbaz');
+    expect(result.after).to.eql('\n```\n\nbaz');
   });
 
   it('should remove notebook block', () => {
@@ -41,10 +39,8 @@ describe('notebook enrichment', () => {
     });
     const result = applyCommand(state, 'notebook', 'content');
 
-    expect(result.startTag).to.eql('```notebook\n');
-    expect(result.endTag).to.eql('\n```');
-    expect(result.before).to.eql('foo\n\n');
+    expect(result.before).to.eql('foo\n\n```notebook\n');
     expect(result.selection).to.eql('content');
-    expect(result.after).to.eql('\n\nbaz');
+    expect(result.after).to.eql('\n```\n\nbaz');
   });
 });

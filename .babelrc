@@ -1,11 +1,9 @@
 {
-  "presets": ["es2015", "react"],
-  "plugins": [
-    "transform-class-properties",
-    "transform-object-rest-spread",
-    ["babel-root-import", {
-      "rootPathSuffix": "src"
-    }],
-    "transform-strict-mode"
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "browsers": "last 2 versions, ie 11"
+      }
+    }]
   ]
 }

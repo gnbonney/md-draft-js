@@ -1,4 +1,7 @@
-export function setSelection({ before, startTag, selection, endTag, after, scrollTop, focus }, textarea) {
+module.exports.setSelection = function setSelection(
+  { before, startTag, selection, scrollTop, focus },
+  textarea
+) {
   const start = before.length + startTag.length;
   const end = start + selection.length;
 
@@ -12,9 +15,9 @@ export function setSelection({ before, startTag, selection, endTag, after, scrol
     textarea.scrollTop = scrollTop;
     /* eslint-enable no-param-reassign */
   }
-}
+};
 
-export function getSelection(textarea) {
+module.exports.getSelection = function getSelection(textarea) {
   if (textarea.selectionStart !== undefined) {
     return {
       start: textarea.selectionStart,
@@ -26,4 +29,4 @@ export function getSelection(textarea) {
     start: 0,
     end: 0
   };
-}
+};

@@ -1,9 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './app';
+const React = require('react');
+const ReactDOM = require('react-dom');
+const App = require('./app.jsx');
 
-ReactDOM.render(
-  <App />,
-  // eslint-disable-next-line no-undef
-  document.getElementById('root')
-);
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
