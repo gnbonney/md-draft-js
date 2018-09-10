@@ -62,8 +62,6 @@ module.exports.list = function list(chunks, ordered) {
     result.selection = '';
   }
 
-  const prefix = nextBullet();
-
   if (ordered) {
     result.after = result.after.replace(onext, afterReplacer);
   } else {
@@ -72,10 +70,10 @@ module.exports.list = function list(chunks, ordered) {
 
   result = trim(result, true);
   result = skip(result, { before: beforeSkip, after: afterSkip, any: true });
-  result.startTag = prefix;
+  result.startTag = nextBullet();
   result.selection = result.selection.replace(
-    /\n(?!( - | [0-9]+\. ))/g,
-    `\n${prefix}`
+    /\n(?!([ ]{0,3}- |[ ]{0,3}\d+\. ))/g,
+    () => `\n${nextBullet()}`
   );
 
   return compile(result);

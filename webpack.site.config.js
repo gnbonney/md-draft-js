@@ -5,13 +5,15 @@ const rootPath = __dirname;
 
 module.exports = {
   entry: ['./playground/index.js'],
-
   output: {
     filename: 'bundle.js',
     publicPath: '/',
     path: path.join(rootPath, 'site')
   },
-
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM'
+  },
   module: {
     rules: [
       {
