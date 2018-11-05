@@ -1,5 +1,5 @@
 const { skip } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 
 module.exports.hr = function hr(chunks) {
   const result = Object.assign({}, chunks);

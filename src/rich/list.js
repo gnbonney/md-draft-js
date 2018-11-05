@@ -1,5 +1,5 @@
 const { skip, trim, findTags } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 const { unwrap } = require('./wrapping');
 
 const oprevious = /(\n|^)(([ ]{0,3}(\d+[.])[ \t]+.*)(\n.+|\n{2,}(\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;

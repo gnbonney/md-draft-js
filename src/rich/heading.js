@@ -1,6 +1,6 @@
 const { skip, findTags } = require('../chunks');
-const { compile } = require('../state');
 const many = require('../utils/many');
+const compile = require('./compile');
 
 module.exports.heading = function heading(chunks, level) {
   let calculatedLevel = level || 0;

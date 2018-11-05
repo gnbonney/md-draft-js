@@ -1,5 +1,5 @@
 const { trim } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 
 const rleading = /^(_*)/;
 const rtrailing = /(_*$)/;

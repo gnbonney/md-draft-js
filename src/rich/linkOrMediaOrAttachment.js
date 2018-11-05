@@ -1,6 +1,6 @@
 const parseLinkInput = require('parse-link-input');
 const { trim, findTags } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 
 const rdefinitions = /^[ ]{0,3}\[((?:attachment-)?\d+)]:[ \t]*\n?[ \t]*<?(\S+?)>?[ \t]*\n?[ \t]*(?:(\n*)["(](.+?)[")][ \t]*)?(?:\n+|$)/gm;
 const rattachment = /^attachment-(\d+)$/i;

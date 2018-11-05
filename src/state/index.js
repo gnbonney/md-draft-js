@@ -1,15 +1,5 @@
 const { getCurrentInlineStyle } = require('../rich');
 
-function compile({ before, after, startTag, endTag, ...props }) {
-  return {
-    before: before + startTag,
-    after: endTag + after,
-    startTag: '',
-    endTag: '',
-    ...props
-  };
-}
-
 function createEmpty() {
   return {
     before: '',
@@ -47,7 +37,6 @@ function getText(state) {
   );
 }
 
-module.exports.compile = compile;
 module.exports.createEmpty = createEmpty;
 module.exports.createWithContent = createWithContent;
 module.exports.getText = getText;

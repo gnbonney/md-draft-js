@@ -1,5 +1,5 @@
 const { skip } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 
 const rtextbefore = /\S[ ]*$/;
 const rtextafter = /^[ ]*\S/;

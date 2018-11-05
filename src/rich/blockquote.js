@@ -1,6 +1,6 @@
 const { settings } = require('../utils/constants');
 const { skip } = require('../chunks');
-const { compile } = require('../state');
+const compile = require('./compile');
 const { wrap, unwrap } = require('./wrapping');
 
 const rtrailblankline = /(>[ \t]*)$/;
