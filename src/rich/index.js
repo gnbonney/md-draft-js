@@ -14,15 +14,15 @@ function getCurrentInlineStyle(state) {
   const styles = new Set();
 
   if (isBold(state)) {
-    styles.add('bold');
+    styles.add('BOLD');
   }
 
   if (isItalic(state)) {
-    styles.add('italic');
+    styles.add('ITALIC');
   }
 
   if (isCodeblock(state)) {
-    styles.add('code');
+    styles.add('CODE');
   }
 
   return styles;
