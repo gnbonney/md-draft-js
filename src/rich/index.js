@@ -1,3 +1,5 @@
+const fixEOL = require('../utils/fixEOL');
+const { getSelection } = require('../utils/selection');
 const { bold, isBold } = require('./bold');
 const { italic, isItalic } = require('./italic');
 const { linkOrMediaOrAttachment } = require('./linkOrMediaOrAttachment');
@@ -7,6 +9,24 @@ const { codeblock, isCodeblock } = require('./codeblock');
 const { notebook } = require('./notebook');
 const { heading } = require('./heading');
 const { hr } = require('./hr');
+
+function getCurrentInlineStyle(state) {
+  const styles = new Set();
+
+  if (isBold(state)) {
+    styles.add('bold');
+  }
+
+  if (isItalic(state)) {
+    styles.add('italic');
+  }
+
+  if (isCodeblock(state)) {
+    styles.add('code');
+  }
+
+  return styles;
+}
 
 module.exports.applyCommand = function applyCommand(
   editorState,
@@ -43,6 +63,29 @@ module.exports.applyCommand = function applyCommand(
   }
 };
 
+module.exports.getChunks = function getChunks(textarea) {
+  const selectionInfo = getSelection(textarea);
+  const before = fixEOL(textarea.value.substring(0, selectionInfo.start));
+  const selection = fixEOL(
+    textarea.value.substring(selectionInfo.start, selectionInfo.end)
+  );
+  const after = fixEOL(textarea.value.substring(selectionInfo.end));
+  const state = {
+    before,
+    after,
+    selection,
+    startTag: '',
+    endTag: '',
+    scrollTop: textarea.scrollTop,
+    text: textarea.value,
+    focus: false
+  };
+
+  state.getCurrentInlineStyle = () => getCurrentInlineStyle(state);
+
+  return state;
+};
+
 module.exports.isApplied = function isApplied(state, command) {
   switch (command) {
     case 'bold':
@@ -56,20 +99,4 @@ module.exports.isApplied = function isApplied(state, command) {
   }
 };
 
-module.exports.getCurrentInlineStyle = function getCurrentInlineStyle(state) {
-  const styles = new Set();
-
-  if (isBold(state)) {
-    styles.add('bold');
-  }
-
-  if (isItalic(state)) {
-    styles.add('italic');
-  }
-
-  if (isCodeblock(state)) {
-    styles.add('code');
-  }
-
-  return styles;
-};
+module.exports.getCurrentInlineStyle = getCurrentInlineStyle;

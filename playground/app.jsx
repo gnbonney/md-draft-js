@@ -11,7 +11,8 @@ module.exports = class MyEditor extends React.Component {
     super(props);
 
     this.state = { editorState: EditorState.createWithContent(content) };
-    this.onChange = (editorState) => this.setState({ editorState });
+    this.onChange = (editorState) =>
+      console.log(editorState) || this.setState({ editorState });
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
   }
 
@@ -56,7 +57,9 @@ module.exports = class MyEditor extends React.Component {
               key={key}
               className={classNames(
                 'editor-action',
-                isApplied(this.state.editorState, command) ? 'active' : ''
+                this.state.editorState.getCurrentInlineStyle().has(command)
+                  ? 'active'
+                  : ''
               )}
               onClick={this.onClickCommand.bind(this, command)}
               aria-label="Bold"

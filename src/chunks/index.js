@@ -1,27 +1,5 @@
 const many = require('../utils/many');
-const fixEOL = require('../utils/fixEOL');
-const { getSelection } = require('../utils/selection');
 const extendRegExp = require('./extendRegExp');
-
-module.exports.getChunks = function getChunks(textarea) {
-  const selectionInfo = getSelection(textarea);
-  const before = fixEOL(textarea.value.substring(0, selectionInfo.start));
-  const selection = fixEOL(
-    textarea.value.substring(selectionInfo.start, selectionInfo.end)
-  );
-  const after = fixEOL(textarea.value.substring(selectionInfo.end));
-
-  return {
-    before,
-    after,
-    selection,
-    startTag: '',
-    endTag: '',
-    scrollTop: textarea.scrollTop,
-    text: textarea.value,
-    focus: false
-  };
-};
 
 module.exports.findTags = function findTags(state, startRegex, endRegex) {
   let regex;

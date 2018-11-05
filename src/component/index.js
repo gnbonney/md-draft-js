@@ -2,7 +2,7 @@ const isKeyCombo = require('is-key-combo');
 const React = require('react');
 const PropTypes = require('prop-types');
 const { commands } = require('../utils/constants');
-const { getChunks } = require('../chunks');
+const { getChunks } = require('../rich');
 const { setSelection } = require('../utils/selection');
 const { getText } = require('../state');
 

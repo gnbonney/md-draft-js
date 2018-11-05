@@ -1,7 +1,7 @@
 const { getCurrentInlineStyle } = require('../rich');
 
 function createEmpty() {
-  return {
+  const state = {
     before: '',
     after: '',
     selection: '',
@@ -10,9 +10,12 @@ function createEmpty() {
     scrollTop: 0,
     start: 0,
     end: 0,
-    focus: false,
-    getCurrentInlineStyle
+    focus: false
   };
+
+  state.getCurrentInlineStyle = () => getCurrentInlineStyle(state);
+
+  return state;
 }
 
 function createWithContent(initialState) {
