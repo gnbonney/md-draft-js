@@ -55,3 +55,21 @@ module.exports.isApplied = function isApplied(state, command) {
       return false;
   }
 };
+
+module.exports.getCurrentInlineStyle = function getCurrentInlineStyle(state) {
+  const styles = new Set();
+
+  if (isBold(state)) {
+    styles.add('bold');
+  }
+
+  if (isItalic(state)) {
+    styles.add('italic');
+  }
+
+  if (isCodeblock(state)) {
+    styles.add('code');
+  }
+
+  return styles;
+};

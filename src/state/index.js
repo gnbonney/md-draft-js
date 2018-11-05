@@ -1,3 +1,5 @@
+const { getCurrentInlineStyle } = require('../rich');
+
 function compile({ before, after, startTag, endTag, ...props }) {
   return {
     before: before + startTag,
@@ -18,7 +20,8 @@ function createEmpty() {
     scrollTop: 0,
     start: 0,
     end: 0,
-    focus: false
+    focus: false,
+    getCurrentInlineStyle
   };
 }
 
