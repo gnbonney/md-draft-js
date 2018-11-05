@@ -11,8 +11,7 @@ module.exports = class MyEditor extends React.Component {
     super(props);
 
     this.state = { editorState: EditorState.createWithContent(content) };
-    this.onChange = (editorState) =>
-      console.log(editorState) || this.setState({ editorState });
+    this.onChange = (editorState) => this.setState({ editorState });
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
   }
 
