@@ -101,13 +101,13 @@ class Editor extends React.Component {
           }${imagePlaceholder}\n`
         });
 
-        this.props.onImageUpload(item).then((url) => {
+        this.props.onImageUpload(item).then(({ src, alt }) => {
           this.removeUploadingItem(uploadingItemIndex);
 
           const newChunks = replaceText(
             this.props.editorState,
             imagePlaceholder,
-            `![image](${url})`
+            `![${alt}](${src})`
           );
           this.props.onChange(newChunks);
         });
@@ -145,7 +145,12 @@ Editor.defaultProps = {
   name: 'content',
   onChange: () => {},
   onKeyCommand: () => {},
-  onImageUpload: getDataURL,
+  onImageUpload: (file) => {
+    return getDataURL(file).then((dataURL) => ({
+      src: dataURL,
+      alt: 'image'
+    }));
+  },
   onFileUpload: () => {},
   commands
 };
