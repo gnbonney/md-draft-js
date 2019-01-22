@@ -1,9 +1,7 @@
-extends: ["eslint-config-airbnb-base", "plugin:prettier/recommended"]
+extends: ['eslint-config-airbnb-base', 'plugin:prettier/recommended']
 
 env:
-  node: true
-  es6: true
-  mocha: true
+  browser: true
 
 rules:
   prefer-arrow-callback:

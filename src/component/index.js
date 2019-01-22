@@ -3,8 +3,12 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const { commands } = require('../utils/constants');
 const { getChunks } = require('../rich');
+const { isImage, getDataURL } = require('../utils/media');
 const { setSelection } = require('../utils/selection');
-const { getText } = require('../state');
+const { getText, replaceText } = require('../state');
+
+const getImageUploadPlaceholder = (index) =>
+  `![Uploading image${index === 0 ? '' : ` (${index})`}]()`;
 
 class Editor extends React.Component {
   constructor(props) {
@@ -12,6 +16,9 @@ class Editor extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handlePaste = this.handlePaste.bind(this);
+    this.handleDrop = this.handleDrop.bind(this);
+    this.uploadingItems = [];
   }
 
   shouldComponentUpdate(nextProps) {
@@ -27,20 +34,87 @@ class Editor extends React.Component {
     setSelection(this.props.editorState, this.textarea);
   }
 
-  handleKeyDown(e) {
+  handleKeyDown(event) {
     this.props.commands.forEach((command) => {
-      if (command.combo && isKeyCombo(e, command.combo)) {
-        e.preventDefault();
+      if (command.combo && isKeyCombo(event, command.combo)) {
+        event.preventDefault();
         this.props.onKeyCommand(command);
       }
     });
   }
 
-  handleChange(e) {
-    const { onChange } = this.props;
-    const chunks = getChunks(e.target);
+  handleChange(event) {
+    const chunks = getChunks(event.target);
 
-    onChange(chunks);
+    this.props.onChange(chunks);
+  }
+
+  getUploadingItemIndex() {
+    if (this.uploadingItems.length === 0) {
+      this.uploadingItems.push(0);
+
+      return 0;
+    }
+
+    const newIndex = this.uploadingItems[this.uploadingItems.length - 1] + 1;
+
+    this.uploadingItems.push(newIndex);
+
+    return newIndex;
+  }
+
+  removeUploadingItem(index) {
+    this.uploadingItems = this.uploadingItems.filter((item) => item !== index);
+  }
+
+  handlePaste(event) {
+    this.processDataTransferItems(event, event.clipboardData.items);
+  }
+
+  handleDrop(event) {
+    event.preventDefault();
+
+    this.processDataTransferItems(event, event.dataTransfer.items);
+  }
+
+  processDataTransferItems(event, items) {
+    if (!items) {
+      return;
+    }
+
+    [...items].forEach((item) => {
+      if (isImage(item)) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const prev = `${this.props.editorState.before}${
+          this.props.editorState.selection
+        }`;
+        const uploadingItemIndex = this.getUploadingItemIndex();
+        const imagePlaceholder = getImageUploadPlaceholder(uploadingItemIndex);
+
+        this.props.onChange({
+          ...this.props.editorState,
+          selection: '',
+          before: `${prev}${
+            !prev || /\n$/.test(prev) ? '' : '\n'
+          }${imagePlaceholder}\n`
+        });
+
+        this.props.onImageUpload(item).then((url) => {
+          this.removeUploadingItem(uploadingItemIndex);
+
+          const newChunks = replaceText(
+            this.props.editorState,
+            imagePlaceholder,
+            `![image](${url})`
+          );
+          this.props.onChange(newChunks);
+        });
+      } else {
+        this.props.onFileUpload(item);
+      }
+    });
   }
 
   render() {
@@ -59,7 +133,9 @@ class Editor extends React.Component {
       className: this.props.className,
       onKeyDown: this.handleKeyDown,
       onChange: this.handleChange,
-      onSelect: this.handleChange
+      onSelect: this.handleChange,
+      onPaste: this.handlePaste,
+      onDrop: this.handleDrop
     });
   }
 }
@@ -69,6 +145,8 @@ Editor.defaultProps = {
   name: 'content',
   onChange: () => {},
   onKeyCommand: () => {},
+  onImageUpload: getDataURL,
+  onFileUpload: () => {},
   commands
 };
 
