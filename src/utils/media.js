@@ -5,7 +5,6 @@ function isImage(file) {
 function getDataURL(file) {
   return new Promise((resolve, reject) => {
     try {
-      const blob = file.getAsFile();
       const reader = new FileReader();
 
       reader.onload = (event) => {
@@ -16,7 +15,7 @@ function getDataURL(file) {
 
         reader.abort();
       };
-      reader.readAsDataURL(blob);
+      reader.readAsDataURL(file);
     } catch (error) {
       reject(error);
     }

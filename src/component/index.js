@@ -92,6 +92,7 @@ class Editor extends React.Component {
         }`;
         const uploadingItemIndex = this.getUploadingItemIndex();
         const imagePlaceholder = getImageUploadPlaceholder(uploadingItemIndex);
+        const file = item.getAsFile();
 
         this.props.onChange({
           ...this.props.editorState,
@@ -101,7 +102,7 @@ class Editor extends React.Component {
           }${imagePlaceholder}\n`
         });
 
-        this.props.onImageUpload(item).then(({ src, alt }) => {
+        this.props.onImageUpload(file).then(({ src, alt }) => {
           this.removeUploadingItem(uploadingItemIndex);
 
           const newChunks = replaceText(
@@ -112,7 +113,9 @@ class Editor extends React.Component {
           this.props.onChange(newChunks);
         });
       } else {
-        this.props.onFileUpload(item);
+        const file = item.getAsFile();
+
+        this.props.onFileUpload(file);
       }
     });
   }
