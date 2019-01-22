@@ -102,16 +102,28 @@ class Editor extends React.Component {
           }${imagePlaceholder}\n`
         });
 
-        this.props.onImageUpload(file).then(({ src, alt }) => {
-          this.removeUploadingItem(uploadingItemIndex);
+        this.props
+          .onImageUpload(file)
+          .then(({ src, alt }) => {
+            this.removeUploadingItem(uploadingItemIndex);
 
-          const newChunks = replaceText(
-            this.props.editorState,
-            imagePlaceholder,
-            `![${alt}](${src})`
-          );
-          this.props.onChange(newChunks);
-        });
+            const newChunks = replaceText(
+              this.props.editorState,
+              imagePlaceholder,
+              `![${alt}](${src})`
+            );
+            this.props.onChange(newChunks);
+          })
+          .catch(() => {
+            this.removeUploadingItem(uploadingItemIndex);
+
+            const newChunks = replaceText(
+              this.props.editorState,
+              imagePlaceholder,
+              ''
+            );
+            this.props.onChange(newChunks);
+          });
       } else {
         const file = item.getAsFile();
 
