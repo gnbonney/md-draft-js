@@ -145,12 +145,11 @@ Editor.defaultProps = {
   name: 'content',
   onChange: () => {},
   onKeyCommand: () => {},
-  onImageUpload: (file) => {
-    return getDataURL(file).then((dataURL) => ({
+  onImageUpload: (file) =>
+    getDataURL(file).then((dataURL) => ({
       src: dataURL,
       alt: 'image'
-    }));
-  },
+    })),
   onFileUpload: () => {},
   commands
 };
