@@ -52,7 +52,7 @@ class Editor extends React.Component {
 
   handleDrop(event) {
     event.preventDefault();
-
+    this.props.onDrop(event);
     this.processDataTransferItems(event, event.dataTransfer.items);
   }
 
@@ -108,6 +108,7 @@ Editor.defaultProps = {
   content: '',
   name: 'content',
   onChange: () => {},
+  onDrop: () => {},
   onKeyCommand: () => {},
   onImageUpload: (file) =>
     getDataURL(file).then((dataURL) => ({
