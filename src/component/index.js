@@ -62,19 +62,18 @@ class Editor extends React.Component {
     }
 
     [...items].forEach((item) => {
+      const file = item.getAsFile();
+
       if (isImage(item)) {
         event.preventDefault();
         event.stopPropagation();
 
-        const file = item.getAsFile();
         mediaUpload(
           () => this.props.editorState,
           this.props.onImageUpload(file),
           this.props.onChange
         );
       } else {
-        const file = item.getAsFile();
-
         this.props.onFileUpload(file);
       }
     });
@@ -98,7 +97,9 @@ class Editor extends React.Component {
       onChange: this.handleChange,
       onSelect: this.handleChange,
       onPaste: this.handlePaste,
-      onDrop: this.handleDrop
+      onDrop: this.handleDrop,
+      onDragOver: this.props.onDragOver,
+      onDragLeave: this.props.onDragLeave
     });
   }
 }
@@ -124,6 +125,10 @@ Editor.propTypes = {
   name: PropTypes.string,
   onChange: PropTypes.func,
   onKeyCommand: PropTypes.func,
+  onImageUpload: PropTypes.func,
+  onFileUpload: PropTypes.func,
+  onDragOver: PropTypes.func,
+  onDragLeave: PropTypes.func,
   commands: PropTypes.array
 };
 
