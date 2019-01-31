@@ -2,13 +2,10 @@ const isKeyCombo = require('is-key-combo');
 const React = require('react');
 const PropTypes = require('prop-types');
 const { commands } = require('../utils/constants');
-const { getChunks } = require('../rich');
+const { getChunks, mediaUpload } = require('../rich');
 const { isImage, getDataURL } = require('../utils/media');
 const { setSelection } = require('../utils/selection');
-const { getText, replaceText } = require('../state');
-
-const getImageUploadPlaceholder = (index) =>
-  `![Uploading image${index === 0 ? '' : ` (${index})`}]()`;
+const { getText } = require('../state');
 
 class Editor extends React.Component {
   constructor(props) {
@@ -49,24 +46,6 @@ class Editor extends React.Component {
     this.props.onChange(chunks);
   }
 
-  getUploadingItemIndex() {
-    if (this.uploadingItems.length === 0) {
-      this.uploadingItems.push(0);
-
-      return 0;
-    }
-
-    const newIndex = this.uploadingItems[this.uploadingItems.length - 1] + 1;
-
-    this.uploadingItems.push(newIndex);
-
-    return newIndex;
-  }
-
-  removeUploadingItem(index) {
-    this.uploadingItems = this.uploadingItems.filter((item) => item !== index);
-  }
-
   handlePaste(event) {
     this.processDataTransferItems(event, event.clipboardData.items);
   }
@@ -87,43 +66,12 @@ class Editor extends React.Component {
         event.preventDefault();
         event.stopPropagation();
 
-        const prev = `${this.props.editorState.before}${
-          this.props.editorState.selection
-        }`;
-        const uploadingItemIndex = this.getUploadingItemIndex();
-        const imagePlaceholder = getImageUploadPlaceholder(uploadingItemIndex);
         const file = item.getAsFile();
-
-        this.props.onChange({
-          ...this.props.editorState,
-          selection: '',
-          before: `${prev}${
-            !prev || /\n$/.test(prev) ? '' : '\n'
-          }${imagePlaceholder}\n`
-        });
-
-        this.props
-          .onImageUpload(file)
-          .then(({ src, alt }) => {
-            this.removeUploadingItem(uploadingItemIndex);
-
-            const newChunks = replaceText(
-              this.props.editorState,
-              imagePlaceholder,
-              `![${alt}](${src})`
-            );
-            this.props.onChange(newChunks);
-          })
-          .catch(() => {
-            this.removeUploadingItem(uploadingItemIndex);
-
-            const newChunks = replaceText(
-              this.props.editorState,
-              imagePlaceholder,
-              ''
-            );
-            this.props.onChange(newChunks);
-          });
+        mediaUpload(
+          () => this.props.editorState,
+          this.props.onImageUpload(file),
+          this.props.onChange
+        );
       } else {
         const file = item.getAsFile();
 

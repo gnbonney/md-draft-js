@@ -13,10 +13,6 @@ module.exports = {
     path: '/',
     publicPath: '/assets/'
   },
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM'
-  },
   devServer: {
     hot: true
   },

@@ -9,6 +9,7 @@ const { codeblock, isCodeblock } = require('./codeblock');
 const { notebook } = require('./notebook');
 const { heading } = require('./heading');
 const { hr } = require('./hr');
+const { mediaUpload } = require('./mediaUpload');
 
 function getCurrentInlineStyle(state) {
   const styles = new Set();
@@ -99,4 +100,5 @@ module.exports.isApplied = function isApplied(state, command) {
   }
 };
 
+module.exports.mediaUpload = mediaUpload;
 module.exports.getCurrentInlineStyle = getCurrentInlineStyle;
