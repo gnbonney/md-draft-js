@@ -1,48 +1,58 @@
 const { trim } = require('../chunks');
 const compile = require('./compile');
 
-const rleading = /^(\**)/;
-const rtrailing = /(\**$)/;
-const rtrailingspace = /(\s?)$/;
-const rnewlines = /\n{2,}/g;
+const boldTag = '**';
 
 module.exports.bold = function bold(chunks) {
-  const result = trim(chunks);
-
-  result.selection = result.selection.replace(rnewlines, '\n');
-
-  const leadStars = rtrailing.exec(result.before)[0];
-  const trailStars = rleading.exec(result.after)[0];
-  const stars = '\\*{2}';
-  const fence = Math.min(leadStars.length, trailStars.length);
-
-  if (fence >= 2) {
-    result.before = result.before.replace(new RegExp(`${stars}$`, ''), '');
-    result.after = result.after.replace(new RegExp(`^${stars}`, ''), '');
-  } else if (!result.selection && trailStars) {
-    result.after = result.after.replace(rleading, '');
-    result.before =
-      result.before.replace(rtrailingspace, '') + trailStars + RegExp.$1;
-  } else {
-    if (!result.selection && !trailStars) {
-      result.selection = '';
-    }
-
-    const markup = '**';
-    result.before += markup;
-    result.after = markup + result.after;
-  }
-
-  return compile(result);
+  const state = trimRepeatedNewLines(trim(chunks));
+  return compile({
+    ...state,
+    ...applyBold(state)
+  });
 };
 
-module.exports.isBold = function isBold(chunks) {
-  const result = trim(chunks);
-  const leadStars = rtrailing.exec(result.before)[0];
-  const trailStars = rleading.exec(result.after)[0];
-  const fence = Math.min(leadStars.length, trailStars.length);
+function applyBold({ before, selection, after }) {
+  if (before.endsWith(boldTag) && after.startsWith(boldTag)) {
+    // remove bold tags from surroundings of selection
+    return {
+      before: before.slice(0, -boldTag.length),
+      after: after.slice(boldTag.length)
+    };
+  }
 
-  return (
-    fence >= 2 || (!result.selection.replace(rnewlines, '\n') && trailStars)
-  );
+  if (selection.startsWith(boldTag) && selection.endsWith(boldTag)) {
+    // remove bold tags from selection
+    return {
+      selection: selection.slice(boldTag.length, -boldTag.length)
+    };
+  }
+
+  // add bold tags to surroundings of selection
+  return {
+    before: before + boldTag,
+    after: boldTag + after
+  };
+}
+
+function trimRepeatedNewLines(data) {
+  return { ...data, selection: data.selection.replace(/\n{2,}/g, '\n') };
+}
+
+module.exports.isBold = function isBold(chunks) {
+  const state = trimRepeatedNewLines(trim(chunks));
+  const { before, selection, after } = state;
+
+  if (before.endsWith(boldTag) && after.startsWith(boldTag)) {
+    return true;
+  }
+
+  if (selection.startsWith(boldTag) && selection.endsWith(boldTag)) {
+    return true;
+  }
+
+  if (!selection && after.startsWith(boldTag)) {
+    return true;
+  }
+
+  return false;
 };
