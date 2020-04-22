@@ -3,7 +3,7 @@ const extendRegExp = require('./extendRegExp');
 
 module.exports.findTags = function findTags(state, startRegex, endRegex) {
   let regex;
-  const result = Object.assign({}, state);
+  const result = { ...state };
 
   if (startRegex) {
     regex = extendRegExp(startRegex, '', '$');
@@ -36,7 +36,7 @@ module.exports.findTags = function findTags(state, startRegex, endRegex) {
 
 module.exports.skip = function skip(state, options) {
   const o = options || {};
-  const result = Object.assign({}, state);
+  const result = { ...state };
   let beforeCount = 'before' in o ? o.before : 1;
   let afterCount = 'after' in o ? o.after : 1;
 
@@ -70,7 +70,7 @@ module.exports.skip = function skip(state, options) {
 };
 
 module.exports.trim = function trim(state, remove) {
-  const result = Object.assign({}, state);
+  const result = { ...state };
 
   result.selection = result.selection
     .replace(/^(\s*)/, remove ? '' : beforeReplacer)

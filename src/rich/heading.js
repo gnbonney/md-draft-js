@@ -4,7 +4,7 @@ const compile = require('./compile');
 
 module.exports.heading = function heading(chunks, level) {
   let calculatedLevel = level || 0;
-  let result = Object.assign({}, chunks);
+  let result = { ...chunks };
 
   result.selection = result.selection
     .replace(/\s+/g, ' ')

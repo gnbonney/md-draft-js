@@ -2,7 +2,7 @@ const { skip } = require('../chunks');
 const compile = require('./compile');
 
 module.exports.hr = function hr(chunks) {
-  const result = Object.assign({}, chunks);
+  const result = { ...chunks };
 
   result.startTag = '----------\n';
   result.selection = '';

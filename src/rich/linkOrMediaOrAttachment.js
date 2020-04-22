@@ -10,7 +10,7 @@ function pushDefinition({ chunks, definition, attachment }) {
   let anchor = 0;
   const definitions = {};
   const footnotes = [];
-  const result = Object.assign({}, chunks);
+  const result = { ...chunks };
 
   result.before = extractDefinitions(result.before);
   result.selection = extractDefinitions(result.selection);

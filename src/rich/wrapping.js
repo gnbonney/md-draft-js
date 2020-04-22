@@ -7,9 +7,7 @@ const rtrailingspaces = /\s+$/;
 function unwrap(chunks) {
   rtext.lastIndex = 0;
 
-  return Object.assign({}, chunks, {
-    selection: chunks.selection.replace(rtext, '$1 $2')
-  });
+  return { ...chunks, selection: chunks.selection.replace(rtext, '$1 $2') };
 }
 
 function wrap(chunks, len) {

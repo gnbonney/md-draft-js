@@ -54,7 +54,7 @@ function inline(chunks) {
 }
 
 function block(chunks, outfenced) {
-  let result = Object.assign({}, chunks);
+  let result = { ...chunks };
 
   if (outfenced) {
     result.before = result.before.replace(rfencebefore, '');

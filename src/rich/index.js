@@ -34,7 +34,7 @@ module.exports.applyCommand = function applyCommand(
   command,
   metadata
 ) {
-  const state = Object.assign({}, editorState, { focus: true });
+  const state = { ...editorState, focus: true };
 
   switch (command) {
     case 'bold':

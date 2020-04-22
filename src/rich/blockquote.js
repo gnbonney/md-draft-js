@@ -14,7 +14,7 @@ module.exports.blockquote = function blockquote(chunks) {
   let match = '';
   let leftOver = '';
   let line;
-  let result = Object.assign({}, chunks);
+  let result = { ...chunks };
 
   result.selection = result.selection.replace(rnewlinefencing, newlinereplacer);
   result.before = result.before.replace(

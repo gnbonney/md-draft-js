@@ -20,16 +20,11 @@ module.exports.notebook = function notebook(chunks, metadata) {
     return block(chunks, outfenced, metadata);
   }
 
-  return compile(
-    Object.assign({}, chunks, {
-      startTag: '\n```notebook\n',
-      endTag: '```\n'
-    })
-  );
+  return compile({ ...chunks, startTag: '\n```notebook\n', endTag: '```\n' });
 };
 
 function block(chunks, outfenced, metadata) {
-  let result = Object.assign({}, chunks);
+  let result = { ...chunks };
 
   if (outfenced) {
     result.before = result.before.replace(rfencebefore, '');
